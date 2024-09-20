@@ -36,7 +36,7 @@ $progId = "AcroExch.Document"
 # Setting the default PDF viewer using registry modification
 $null = New-Item -Path "HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations$extension\UserChoice" -Force
 Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations$extension\UserChoice" -Name 'ProgId' -Value $progId
-Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations$extension\UserChoice" -Name 'OpenWithProgId' -Value 'Applications\AcroRd32.exe'
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations$extension\UserChoice" -Name 'OpenWithProgId' -Value 'Applications\Acrobat.exe'
 
 # Alternative method using ftype and assoc
 & cmd.exe /c "ftype $progId=`"%ProgramFiles%\Adobe\Acrobat DC\Acrobat\AcroRd32.exe`" `%1"
