@@ -1,24 +1,45 @@
+# Define the log file path in the default Temp directory
+$logFilePath = "$env:TEMP\AdobeAcrobatDC_install.log"
+
+# Function to write log messages
+function Write-Log {
+    param (
+        [string]$message
+    )
+    # Append the current date and time to the message
+    $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+    $logMessage = "$timestamp - $message"
+    
+    # Write to log file
+    Add-Content -Path $logFilePath -Value $logMessage
+    # Also display the message in the console
+    Write-Host $logMessage
+}
+
 # Step 1: Download the Adobe Reader installer using WebClient
 $downloadUrl = "https://ardownload2.adobe.com/pub/adobe/acrobat/win/AcrobatDC/2400320112/AcroRdrDCx642400320112_cs_CZ.exe"
 $installerPath = "$env:TEMP\AcroRdrDCx642400320112_cs_CZ.exe"
 
-Write-Host "Downloading Adobe Reader using WebClient..."
+Write-Log "Downloading Adobe Reader using WebClient..."
 $webClient = New-Object System.Net.WebClient
 $webClient.DownloadFile($downloadUrl, $installerPath)
 
 # Step 2: Install Adobe Reader silently
-Write-Host "Installing Adobe Reader silently..."
+Write-Log "Installing Adobe Reader silently..."
 Start-Process -FilePath $installerPath -ArgumentList "/sAll", "/rs", "/msi", "EULA_ACCEPT=YES" -Wait
 
 # Step 3: Set Adobe Reader as the default app for PDF
-Write-Host "Setting Adobe Reader as the default app for PDFs..."
+Write-Log "Setting Adobe Reader as the default app for PDFs..."
 $extension = ".pdf"
-$progId = "AcroExch.Document.DC"
+$progId = "AcroExch.Document"
 
-# Use the "ftype" command to associate the file extension with the ProgID
+# Setting the default PDF viewer using registry modification
+$null = New-Item -Path "HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations$extension\UserChoice" -Force
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations$extension\UserChoice" -Name 'ProgId' -Value $progId
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\Shell\Associations\UrlAssociations$extension\UserChoice" -Name 'OpenWithProgId' -Value 'Applications\AcroRd32.exe'
+
+# Alternative method using ftype and assoc
 & cmd.exe /c "ftype $progId=`"%ProgramFiles%\Adobe\Acrobat DC\Acrobat\AcroRd32.exe`" `%1"
-
-# Use "assoc" to associate .pdf with the program
 & cmd.exe /c "assoc $extension=$progId"
 
-Write-Host "Adobe Reader has been installed and set as the default PDF viewer."
+Write-Log "Adobe Reader has been installed and set as the default PDF viewer."
