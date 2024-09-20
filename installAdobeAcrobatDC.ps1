@@ -31,7 +31,7 @@ Start-Process -FilePath $installerPath -ArgumentList "/sAll", "/rs", "/msi", "EU
 # Step 3: Set Adobe Reader as the default app for PDF
 Write-Log "Setting Adobe Reader as the default app for PDFs..."
 $extension = ".pdf"
-$progId = "AcroExch.Document"
+$progId = "AcroExch.Document.DC"
 
 # Alternative method using ftype and assoc
 & cmd.exe /c "ftype $progId=`"%ProgramFiles%\Adobe\Acrobat DC\Acrobat\Acrobat.exe`" `%1"
